@@ -17,6 +17,11 @@ function PlayState:init()
 
     self.gravityOn = true
     self.gravityAmount = 6
+end
+
+function PlayState:enter(params)
+    self.level = LevelMaker.generate(params.level_Width or 100, 10)
+    self.tileMap = self.level.tileMap
 
     self.player = Player({
         x = 0, y = 0,
@@ -46,7 +51,7 @@ function PlayState:update(dt)
     -- update player and level
     self.player:update(dt)
     self.level:update(dt)
-    self:updateCamera()
+    
 
     -- constrain player X no matter which state
     if self.player.x <= 0 then
@@ -54,6 +59,8 @@ function PlayState:update(dt)
     elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
         self.player.x = TILE_SIZE * self.tileMap.width - self.player.width
     end
+
+    self:updateCamera()
 end
 
 function PlayState:render()
@@ -73,6 +80,17 @@ function PlayState:render()
     self.player:render()
     love.graphics.pop()
     
+    -- MARIO UPDATE: render key
+    if self.player.key_Obj then
+    
+        love.graphics.draw(gTextures[self.player.key_Obj.texture], gFrames[self.player.key_Obj.texture][self.player.key_Obj.frame], 5, 20)
+    end
+
+    if self.player.level_Complete then
+
+        self.player:renderLevel_Complete()
+    end
+
     -- render score
     love.graphics.setFont(gFonts['medium'])
     love.graphics.setColor(0, 0, 0, 1)

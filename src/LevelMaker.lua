@@ -16,6 +16,8 @@ function LevelMaker.generate(width, height)
     local objects = {}
 
     local tileID = TILE_ID_GROUND
+    local ground_Height = 6
+    local pillar_Height = 4
     
     -- whether we should draw our tiles with toppers
     local topper = true
@@ -173,8 +175,8 @@ function LevelMaker.generate(width, height)
         local x_Pos = math.random(width)
         if tiles[height][x_Pos].id == TILE_ID_GROUND then
 
-            local  block_Height
-            if tiles[ground_Height][x_Pos].id == TILE_ID_EMPTY then
+            local block_Height
+            if tiles[ground_Height][x_Pos].id == TILE_ then
                 block_Height = ground_Height - 2
             elseif tiles[pillar_Height][x_Pos].id == TILE_ID_EMPTY then
                 block_Height = pillar_Height - 2
@@ -251,11 +253,10 @@ function get_KeyLock_Base(Key_or_Lock, block_Height, x, KeyLock_Color)
 
     return{
         texture = 'keys_locks',
-
-        x, y = (x_Pos - 1) * TILE_SIZE, (y_Pos - 1) * TILE_SIZE,  -- offset for better looks
-
-        width, height = 16, 16,
-
+        x = (x_Pos - 1) * TILE_SIZE,
+        y = (y_Pos - 1) * TILE_SIZE,  -- offset for better looks
+        width = 16,
+        height = 16,
         collidable = true,
         consumable = Key_or_Lock == KEY_ID,
         solid = Key_or_Lock == LOCK_ID,
@@ -283,7 +284,7 @@ function get_Flag(tiles, objects, width, height, flagpost_Color)
         end 
     end
     
-    -- flagpost creation
+    -- MARIO UPDATE: flagpost creation
     for pole_Part = 2, 0, -1 do
         
         table.insert(flag, generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part))
@@ -300,7 +301,7 @@ function get_Flag(tiles, objects, width, height, flagpost_Color)
         y_Pos = y_Pos - 1
     end
 
-    -- add flag
+    -- MARIO UPDATE: add flag
     table.insert(flag, generate_Flag(width, x_Pos, y_Pos + 2))
 
     return flag
@@ -313,9 +314,11 @@ function generate_Flag(width, x_Pos, y_Pos)
     return GameObject {
         texture = 'flags',
 
-        x, y = (x_Pos - 1) * TILE_SIZE + 8, (y_Pos - 1) * TILE_SIZE - 8,  -- offset for better looks
+        x = (x_Pos - 1) * TILE_SIZE + 8,
+        y = (y_Pos - 1) * TILE_SIZE - 8,  -- offset for better looks
 
-        width, height = 16, 16,
+        width = 16,
+        height = 16,
 
         animation = Animation {
             frames = {base_Frame, base_Frame + 1},
@@ -328,25 +331,25 @@ function generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part)
 
     return GameObject {
         texture = 'flags',
-
-        x, y = (x_Pos - 1) * TILE_SIZE, (y_Pos - 1) * TILE_SIZE,  -- offset for better looks
-
-        width, height = 6, 16,
-
+        x = (x_Pos - 1) * TILE_SIZE,
+        y = (y_Pos - 1) * TILE_SIZE,  
+        width = 6,
+        height = 16, 
         frame = flagpost_Color + pole_Part * FLAG_OFFSET,
+        collidable = true, 
+        consumable = true,
+        solid = false,
 
-        collidable, consumable, solid = true, true, false,
-
+        -- MARIO UPDATE: When the flag/flagpost is touched, a new level starts
         onConsume = function(player, object)
             gSounds['pickup']:play()
-            player.score = player.score + 250 *  get_FLag_SegmentMultiplier(pole_Part)
+            player.score = player.score + 250 * get_FLag_SegmentMultiplier(pole_Part)
 
-            gStateMachine:change ('play', {
+            gStateMachine:change ('play',{
                 level_Width =  width + 10,
                 score = player.score,
                 level_Complete = true
             })
-
         end
     }
 end

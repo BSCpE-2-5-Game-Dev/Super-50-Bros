@@ -30,13 +30,13 @@ function Player:render()
     Entity.render(self)
 end
 
-function player:renderLevel_Complete()
+function Player:renderLevel_Complete()
     love.graphics.setFont(gFonts['medium'])
     lvoe.graphics.setColor(0, 0, 0, 255)
     love.graphics.printf("Level Complete!", 0, 5, VIRTUAL_WIDTH, 'center')
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.printf("Level Complete!", 0, 4, VIRTUAL_WIDTH - 1, 'center')
-
+end
 
 function Player:checkLeftCollisions(dt)
     -- check for left two tiles collision
