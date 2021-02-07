@@ -12,7 +12,14 @@ Player = Class{__includes = Entity}
 
 function Player:init(def)
     Entity.init(self, def)
-    self.score = 0
+    -- MARIO UPDATE
+    self.score = def.score or 0
+    self.key_Obj = nil
+    self.level_Complete = def.level_Complete
+
+    if self.level_Complete then
+        Timer.after(4, function () self.level_Complete = false end)
+    end
 end
 
 function Player:update(dt)
@@ -22,6 +29,14 @@ end
 function Player:render()
     Entity.render(self)
 end
+
+function player:renderLevel_Complete()
+    love.graphics.setFont(gFonts['medium'])
+    lvoe.graphics.setColor(0, 0, 0, 255)
+    love.graphics.printf("Level Complete!", 0, 5, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.printf("Level Complete!", 0, 4, VIRTUAL_WIDTH - 1, 'center')
+
 
 function Player:checkLeftCollisions(dt)
     -- check for left two tiles collision
@@ -75,7 +90,7 @@ function Player:checkObjectCollisions()
             if object.solid then
                 table.insert(collidedObjects, object)
             elseif object.consumable then
-                object.onConsume(self)
+                object.onConsume(self, object)
                 table.remove(self.level.objects, k)
             end
         end

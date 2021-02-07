@@ -92,7 +92,14 @@ for i = 1, 30 do
     table.insert(JUMP_BLOCKS, i)
 end
 
--- MARIO UPDATE: constants used for flag's properties and functions
+-- MARIO UPDATE: constants that will be used in key, lock and flag's attributes and functions
+KEYS_LOCKS = {
+    1, 2, 3, 4  -- for different colors 
+}
+
+KEY_ID, LOCK_ID = 0, 4  -- defines the key and lock offsets
+
+
 FLAG_POSTS = {
     1, 2, 3, 4, 5, 6
 }
