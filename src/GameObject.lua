@@ -21,6 +21,8 @@ function GameObject:init(def)
     self.onCollide = def.onCollide
     self.onConsume = def.onConsume
     self.hit = def.hit
+    self.remove =  def.remove or false
+    self.animation = def.animation -- MARIO UPDATE: adding animation property
 end
 
 function GameObject:collides(target)
@@ -29,9 +31,17 @@ function GameObject:collides(target)
 end
 
 function GameObject:update(dt)
-
+    -- MARIO UPDATE: for animation
+    if self.animation then 
+        self.animation: update(dt)
+    end
 end
 
 function GameObject:render()
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
+    -- MARIO UPDATE: for animation 
+    if self.animation then
+        love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.animation:getCurrentFrame()], self.x, self.y)
+    else   
+        love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
+    end
 end

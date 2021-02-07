@@ -166,3 +166,104 @@ function LevelMaker.generate(width, height)
     
     return GameLevel(entities, objects, map)
 end
+
+function get_Flag(tiles, objects, width, height, flagpost_color)
+
+    local flag = {}
+    local y_Pos = 6
+    local x_Pos = -1
+
+    -- check valid flag position
+    for x = width - 1, 1, -1 do
+        if tiles[y_Pos][x].id == TILE_ID_EMPTY and tiles[y_Pos + 1][x].id == TILE_ID_GROUND then
+            x_Pos = x
+            break
+        end
+    end
+
+    for k, obj in pairs(objects) do 
+        if obj.x == (x_Pos - 1) * TILE_SIZE then
+            table.remove(objects, k)
+        end 
+    end
+    
+    -- flagpost creation
+    for pole_Part = 2, 0, -1 do
+        
+        table.insert(flag, generate_FlagPost(width, flagpost_color, x_Pos, y_Pos, pole_Part))
+
+        if pole_Part == 1 then
+
+            y_Pos = y_Pos - 1
+            table.insert(flag, generate_FlagPost(width, flagpost_color, x_Pos, y_Pos, pole_Part))
+
+            y_Pos = y_Pos - 1
+            table.insert(flag, generate_FlagPost(width, flagpost_color, x_Pos, y_Pos, pole_Part))
+        end
+
+        y_Pos = y_Pos - 1
+    end
+
+    -- add flag
+    table.insert(flag, generate_Flag(width, x_Pos, y_Pos + 2))
+
+    return flag
+end
+
+function generate_Flag(width, x_Pos, y_Pos)
+
+    local base_Frame = FLAGS[math.random(#FLAGS)]
+
+    return GameObject {
+        texture = 'flags'
+
+        x, y = (x_Pos - 1) * TILE_SIZE + 8, (y_Pos - 1) * TILE_SIZE - 8,  -- offset for better looks
+
+        width, height = 16, 16,
+
+        animation = Animation {
+            frames = {base_Frame, base_Frame + 1},
+            intervals = 0.2
+        }
+    }
+end
+
+function generate_FlagPost(width, flagpost_color, x_Pos, y_Pos, pole_Part)
+
+    return GameObject {
+        texture = 'flags'
+
+        x, y = (x_Pos - 1) * TILE_SIZE, (y_Pos - 1) * TILE_SIZE,  -- offset for better looks
+
+        width, height = 6, 16,
+
+        frame = flagpost_color + pole_Part * FLAG_OFFSET,
+
+        collidable, consumable, solid = true, true, false,
+
+        onConsume = function(player, object)
+            gSounds['pickup']:play()
+            player.score = player.score + 250 *  get_FLag_SegmentMultiplier(pole_Part)
+
+            gStateMachine:change ('play', {
+                level_Width =  width + 10,
+                score = player.score,
+                level_Complete = true
+            })
+
+        end
+    }
+end
+
+function get_FLag_SegmentMultiplier(pole_Part)
+
+    if pole_Part == 0 then
+        return 3
+    elseif pole_Part == 1 then
+        return 2
+    elseif pole_Part == 2 then
+        return 1
+    end
+
+    return 0
+end

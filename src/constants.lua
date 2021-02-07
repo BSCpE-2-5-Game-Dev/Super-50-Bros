@@ -92,7 +92,7 @@ for i = 1, 30 do
     table.insert(JUMP_BLOCKS, i)
 end
 
--- MARIO UPDATE: constants for generating flag
+-- MARIO UPDATE: constants used for flag's properties and functions
 FLAG_POSTS = {
     1, 2, 3, 4, 5, 6
 }
