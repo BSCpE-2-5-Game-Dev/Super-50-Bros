@@ -10,14 +10,15 @@
 
 LevelMaker = Class{}
 
-function LevelMaker.generate(width, height)
+function LevelMaker.generate(width, height) 
     local tiles = {}
     local entities = {}
     local objects = {}
 
     local tileID = TILE_ID_GROUND
-    local ground_Height = 6
-    local pillar_Height = 4
+
+    local groundHeight = 6
+    local pillarHeight = 4
     
     -- whether we should draw our tiles with toppers
     local topper = true
@@ -25,8 +26,8 @@ function LevelMaker.generate(width, height)
     local topperset = math.random(20)
 
     -- MARIO UPDATE
-    local KeyLock_Color = math.random(#KEYS_LOCKS)
-    local flagpost_Color = math.random(#FLAGS)
+    local keyLockColor = math.random(#KEYS_LOCKS)
+    local flagPostColor = math.random(#FLAG_POSTS)
 
     -- insert blank tables into tiles for later access
     for x = 1, height do
@@ -43,6 +44,16 @@ function LevelMaker.generate(width, height)
                 Tile(x, y, tileID, nil, tileset, topperset))
         end
 
+        -- MARIO UPDATE: Generate ground for the first three tiles
+        if x <= 3 then
+            tileID = TILE_ID_GROUND
+            for y = 7, height do
+                table.insert(tiles[y],
+                    Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
+            end
+            goto continue
+        end
+
         -- chance to just be emptiness
         if math.random(7) == 1 then
             for y = 7, height do
@@ -53,7 +64,7 @@ function LevelMaker.generate(width, height)
             tileID = TILE_ID_GROUND
 
             -- height at which we would spawn a potential jump block
-            local blockHeight = 4
+            local blockHeight = groundHeight - 2
 
             for y = 7, height do
                 table.insert(tiles[y],
@@ -62,7 +73,7 @@ function LevelMaker.generate(width, height)
 
             -- chance to generate a pillar
             if math.random(8) == 1 then
-                blockHeight = 2
+                blockHeight = pillarHeight - 2
                 
                 -- chance to generate bush on pillar
                 if math.random(8) == 1 then
@@ -172,29 +183,29 @@ function LevelMaker.generate(width, height)
     -- MARIO UPDATE: Lock block generation
     local spawned = false
     while not spawned do
-        local x_Pos = math.random(width)
-        if tiles[height][x_Pos].id == TILE_ID_GROUND then
+        local xPos = math.random(width)
+        if tiles[height][xPos].id == TILE_ID_GROUND then
 
-            local block_Height
-            if tiles[ground_Height][x_Pos].id == TILE_ then
-                block_Height = ground_Height - 2
-            elseif tiles[pillar_Height][x_Pos].id == TILE_ID_EMPTY then
-                block_Height = pillar_Height - 2
+            local blockHeight
+            if tiles[groundHeight][xPos].id == TILE_ID_EMPTY then
+                blockHeight = groundHeight - 2
+            elseif tiles[pillarHeight][xPos].id == TILE_ID_EMPTY then
+                blockHeight = pillarHeight - 2
             end
 
-            local lock = get_KeyLock_Base(LOCK_ID, block_Height, x_Pos, KeyLock_Color)
+            local lock = getKeyLockBase(LOCK_ID, blockHeight, xPos, keyLockColor)
 
             -- if player has key, the block is marked as "remove" and the key is removed too.
             lock.onCollide = function(player, object)
 
-                if player.key_Obj then
+                if player.keyObj then
                     gSounds['pickup']:play()
-                    player.key_Obj = nil
-                    player.remove = true
+                    player.keyObj = nil
+                    object.remove = true
 
                     -- flag generation
-                    local flag_Objects = get_Flag(tiles, objects, width, height, flagpost_Color)
-                    for k, obj in pairs(flag_Objects) do
+                    local flagObjects = getFlag(tiles, objects, width, height, flagPostColor)
+                    for k, obj in pairs(flagObjects) do
                         table.insert(objects, obj)
                     end
                 else
@@ -206,8 +217,7 @@ function LevelMaker.generate(width, height)
 
             -- remove any block at the key block position
             for k, obj in pairs(objects) do
-
-                if obj.texture == 'jump-blocks' and obj.x  == (x_Pos - 1) * TILE_SIZE then
+                if obj.texture == 'jump-blocks' and obj.x  == (xPos - 1) * TILE_SIZE then
                     table.remove(objects, k)
                     break
                 end
@@ -218,24 +228,23 @@ function LevelMaker.generate(width, height)
     -- key generation
     spawned = false
     while not spawned do -- try to find a position where to spawn the key
-        local x_Pos = math.random(width)
-        if tiles[height][x_Pos].id == TILE_ID_GROUND then -- check if the tile is a ground and not a chasm
-
-            local  block_Height -- check whether there's a pillar or a ground
-            if tiles[ground_Height][x_Pos].id == TILE_ID_EMPTY then
-                block_Height = ground_Height - 2
-            elseif tiles[pillar_Height][x_Pos].id == TILE_ID_EMPTY then
-                block_Height = pillar_Height - 2
+        local xPos = math.random(width)
+        if tiles[height][xPos].id == TILE_ID_GROUND then -- check if the tile is a ground and not a chasm
+            local  blockHeight -- check whether there's a pillar or a ground
+            if tiles[groundHeight][xPos].id == TILE_ID_EMPTY then
+                blockHeight = groundHeight - 2
+            elseif tiles[pillarHeight][xPos].id == TILE_ID_EMPTY then
+                blockHeight = pillarHeight - 2
             end
 
-            local key = get_KeyLock_Base(KEY_ID, block_Height, x_Pos, KeyLock_Color)
+            local key = getKeyLockBase(KEY_ID, blockHeight, xPos, keyLockColor)
 
             -- if player has key, the block is marked as "remove" and the key is removed too.
             key.onConsume = function(player, object)
                 gSounds['pickup']:play()
-                player.key_Obj = object
+                player.keyObj = object
             end
-            table.insert(objects, GameObject(lock))
+            table.insert(objects, GameObject(key))
             spawned = true
         end
     end
@@ -246,80 +255,76 @@ function LevelMaker.generate(width, height)
     return GameLevel(entities, objects, map)
 end
 
-function get_KeyLock_Base(Key_or_Lock, block_Height, x, KeyLock_Color)
+-- MARIO UPDATE:
+function getKeyLockBase(keyOrLock, blockHeight, x, keyLockColor)
 
     -- The y position  for a key is the ground and for a block the block height
-    local y_Pos = Key_or_Lock == KEY_ID and block_Height + 2 or block_Height
-
-    return{
-        texture = 'keys_locks',
-        x = (x_Pos - 1) * TILE_SIZE,
-        y = (y_Pos - 1) * TILE_SIZE,  -- offset for better looks
+    local yPos = keyOrLock == KEY_ID and blockHeight + 2 or blockHeight
+    return {
+        texture = 'keys-locks',
+        x = (x - 1) * TILE_SIZE,
+        y = (yPos - 1) * TILE_SIZE,  
         width = 16,
         height = 16,
+
         collidable = true,
-        consumable = Key_or_Lock == KEY_ID,
-        solid = Key_or_Lock == LOCK_ID,
-        frame = KEYS_LOCKS[KeyLock_Color] + Key_or_Lock
+        consumable = keyOrLock == KEY_ID,  -- a key is consumable, a lock not
+        solid = keyOrLock == LOCK_ID,      -- a lock is solid, a key not
+
+        frame = KEYS_LOCKS[keyLockColor] + keyOrLock
     }
 end
 
-function get_Flag(tiles, objects, width, height, flagpost_Color)
+function getFlag(tiles, objects, width, height, flagPostColor)
 
     local flag = {}
-    local y_Pos = 6
-    local x_Pos = -1
+    local yPos = 6
+    local xPos = -1
 
     -- check valid flag position
     for x = width - 1, 1, -1 do
-        if tiles[y_Pos][x].id == TILE_ID_EMPTY and tiles[y_Pos + 1][x].id == TILE_ID_GROUND then
-            x_Pos = x
+        if tiles[yPos][x].id == TILE_ID_EMPTY and tiles[yPos + 1][x].id == TILE_ID_GROUND then
+            xPos = x
             break
         end
     end
 
     for k, obj in pairs(objects) do 
-        if obj.x == (x_Pos - 1) * TILE_SIZE then
+        if obj.x == (xPos - 1) * TILE_SIZE then
             table.remove(objects, k)
         end 
     end
     
     -- MARIO UPDATE: flagpost creation
-    for pole_Part = 2, 0, -1 do
+    for poleType = 2, 0, -1 do
         
-        table.insert(flag, generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part))
+        table.insert(flag, generateFlagPost(width, flagPostColor, xPos, yPos, poleType))
 
-        if pole_Part == 1 then
+        if poleType == 1 then
+            yPos = yPos - 1
+            table.insert(flag, generateFlagPost(width, flagPostColor, xPos, yPos, poleType))
 
-            y_Pos = y_Pos - 1
-            table.insert(flag, generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part))
-
-            y_Pos = y_Pos - 1
-            table.insert(flag, generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part))
+            yPos = yPos - 1
+            table.insert(flag, generateFlagPost(width, flagPostColor, xPos, yPos, poleType))
         end
 
-        y_Pos = y_Pos - 1
+        yPos = yPos - 1
     end
 
     -- MARIO UPDATE: add flag
-    table.insert(flag, generate_Flag(width, x_Pos, y_Pos + 2))
+    table.insert(flag, generateFlag(width, xPos, yPos + 2))
 
     return flag
 end
 
-function generate_Flag(width, x_Pos, y_Pos)
-
+function generateFlag(width, xPos, yPos)
     local base_Frame = FLAGS[math.random(#FLAGS)]
-
     return GameObject {
         texture = 'flags',
-
-        x = (x_Pos - 1) * TILE_SIZE + 8,
-        y = (y_Pos - 1) * TILE_SIZE - 8,  -- offset for better looks
-
+        x = (xPos - 1) * TILE_SIZE + 8,
+        y = (yPos - 1) * TILE_SIZE - 8,  -- offset for better looks
         width = 16,
         height = 16,
-
         animation = Animation {
             frames = {base_Frame, base_Frame + 1},
             intervals = 0.2
@@ -327,15 +332,14 @@ function generate_Flag(width, x_Pos, y_Pos)
     }
 end
 
-function generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part)
-
+function generateFlagPost(width, flagPostColor, xPos, yPos, poleType)
     return GameObject {
         texture = 'flags',
-        x = (x_Pos - 1) * TILE_SIZE,
-        y = (y_Pos - 1) * TILE_SIZE,  
+        x = (xPos - 1) * TILE_SIZE,
+        y = (yPos - 1) * TILE_SIZE,  
         width = 6,
         height = 16, 
-        frame = flagpost_Color + pole_Part * FLAG_OFFSET,
+        frame = flagPostColor + poleType * FLAG_OFFSET,
         collidable = true, 
         consumable = true,
         solid = false,
@@ -343,24 +347,23 @@ function generate_FlagPost(width, flagpost_Color, x_Pos, y_Pos, pole_Part)
         -- MARIO UPDATE: When the flag/flagpost is touched, a new level starts
         onConsume = function(player, object)
             gSounds['pickup']:play()
-            player.score = player.score + 250 * get_FLag_SegmentMultiplier(pole_Part)
+            player.score = player.score + 250 * getFlagSegmentMultiplier(poleType)
 
             gStateMachine:change ('play',{
-                level_Width =  width + 10,
+                levelWidth =  width + 10,  -- increment the level width
                 score = player.score,
-                level_Complete = true
+                levelComplete = true
             })
         end
     }
 end
 
-function get_FLag_SegmentMultiplier(pole_Part)
-
-    if pole_Part == 0 then
+function getFlagSegmentMultiplier(poleType)
+    if poleType == 0 then
         return 3
-    elseif pole_Part == 1 then
+    elseif poleType == 1 then
         return 2
-    elseif pole_Part == 2 then
+    elseif poleType == 2 then
         return 1
     end
 

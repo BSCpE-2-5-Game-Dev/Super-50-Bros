@@ -10,8 +10,7 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.camX = 0
     self.camY = 0
-    self.level = LevelMaker.generate(100, 10)
-    self.tileMap = self.level.tileMap
+
     self.background = math.random(3)
     self.backgroundX = 0
 
@@ -20,7 +19,7 @@ function PlayState:init()
 end
 
 function PlayState:enter(params)
-    self.level = LevelMaker.generate(params.level_Width or 100, 10)
+    self.level = LevelMaker.generate(params.levelWidth, 10)
     self.tileMap = self.level.tileMap
 
     self.player = Player({
@@ -33,8 +32,10 @@ function PlayState:enter(params)
             ['jump'] = function() return PlayerJumpState(self.player, self.gravityAmount) end,
             ['falling'] = function() return PlayerFallingState(self.player, self.gravityAmount) end
         },
+        score = params.score,
         map = self.tileMap,
-        level = self.level
+        level = self.level,
+        levelComplete = params.levelComplete or false
     })
 
     self:spawnEnemies()
@@ -81,21 +82,19 @@ function PlayState:render()
     love.graphics.pop()
     
     -- MARIO UPDATE: render key
-    if self.player.key_Obj then
-    
-        love.graphics.draw(gTextures[self.player.key_Obj.texture], gFrames[self.player.key_Obj.texture][self.player.key_Obj.frame], 5, 20)
+    if self.player.keyObj then
+        love.graphics.draw(gTextures[self.player.keyObj.texture], gFrames[self.player.keyObj.texture][self.player.keyObj.frame], 5, 20)
     end
 
-    if self.player.level_Complete then
-
-        self.player:renderLevel_Complete()
+    if self.player.levelComplete then
+        self.player:renderlevelComplete()
     end
 
     -- render score
     love.graphics.setFont(gFonts['medium'])
-    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setColor(0, 0, 0, 255)
     love.graphics.print(tostring(self.player.score), 5, 5)
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print(tostring(self.player.score), 4, 4)
 end
 

@@ -59,7 +59,7 @@ function PlayerJumpState:update(dt)
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
             if object.solid then
-                object.onCollide(object)
+                object.onCollide(self.player, object)
 
                 self.player.y = object.y + object.height
                 self.player.dy = 0
@@ -80,8 +80,7 @@ function PlayerJumpState:update(dt)
     end
 
     -- MARIO UPDATE: remove lock block if marked as "remove"
-    for k, objects in pairs(self.player.level.objects) do
-        
+    for k, object in pairs(self.player.level.objects) do
         if object.remove then
             table.remove(self.player.level.objects, k)
         end

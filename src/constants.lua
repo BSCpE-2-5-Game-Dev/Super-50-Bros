@@ -97,8 +97,9 @@ KEYS_LOCKS = {
     1, 2, 3, 4  -- for different colors 
 }
 
-KEY_ID, LOCK_ID = 0, 4  -- defines the key and lock offsets
-
+-- defines the key and lock offsets
+KEY_ID = 0
+LOCK_ID = 4
 
 FLAG_POSTS = {
     1, 2, 3, 4, 5, 6

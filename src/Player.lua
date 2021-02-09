@@ -14,11 +14,11 @@ function Player:init(def)
     Entity.init(self, def)
     -- MARIO UPDATE
     self.score = def.score or 0
-    self.key_Obj = nil
-    self.level_Complete = def.level_Complete
+    self.keyObj = nil
+    self.levelComplete = def.levelComplete
 
-    if self.level_Complete then
-        Timer.after(4, function () self.level_Complete = false end)
+    if self.levelComplete then
+        Timer.after(4, function () self.levelComplete = false end)
     end
 end
 
@@ -30,7 +30,7 @@ function Player:render()
     Entity.render(self)
 end
 
-function Player:renderLevel_Complete()
+function Player:renderlevelComplete()
     love.graphics.setFont(gFonts['medium'])
     lvoe.graphics.setColor(0, 0, 0, 255)
     love.graphics.printf("Level Complete!", 0, 5, VIRTUAL_WIDTH, 'center')

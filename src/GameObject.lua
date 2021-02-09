@@ -32,14 +32,14 @@ function GameObject:collides(target)
 end
 
 function GameObject:update(dt)
-    -- MARIO UPDATE: for animation
+    -- MARIO UPDATE: triggers animation update
     if self.animation then 
         self.animation: update(dt)
     end
 end
 
 function GameObject:render()
-    -- MARIO UPDATE: for animation 
+    -- MARIO UPDATE: for animation render
     if self.animation then
         love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.animation:getCurrentFrame()], self.x, self.y)
     else   

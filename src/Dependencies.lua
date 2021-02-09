@@ -76,7 +76,7 @@ gTextures = {
     ['blue-alien'] = love.graphics.newImage('graphics/blue_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
     -- MARIO UPDATE: Adding keys and locks spritesheet
-    ['keys_locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
+    ['keys-locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
     -- MARIO UPDATE:  Adding flags spritesheet
     ['flags'] = love.graphics.newImage('graphics/flags.png')
 }
@@ -92,7 +92,7 @@ gFrames = {
     ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
     ['blue-alien'] = GenerateQuads(gTextures['blue-alien'], 16, 20), -- MARIO UPDATE: new frame set for character
     ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
-    ['keys_locks'] = GenerateQuads(gTextures['keys_locks'], 16, 16), -- MARIO UPDATE: frame set of keys and locks
+    ['keys-locks'] = GenerateQuads(gTextures['keys-locks'], 16, 16), -- MARIO UPDATE: frame set of keys and locks
     ['flags'] = GenerateQuads(gTextures['flags'], 16, 16) -- MARIO UPDATE: frame set of goal flag 
 }
 
