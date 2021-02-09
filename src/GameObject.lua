@@ -21,9 +21,7 @@ function GameObject:init(def)
     self.onCollide = def.onCollide
     self.onConsume = def.onConsume
     self.hit = def.hit
-    -- MARIO UPDATE
-    self.remove = def.remove or false 
-    self.animation = def.animation 
+    self.inverted = def.inverted and -1 or 1 -- MARIO UPDATE: inverted attribute
 end
 
 function GameObject:collides(target)
@@ -32,17 +30,9 @@ function GameObject:collides(target)
 end
 
 function GameObject:update(dt)
-    -- MARIO UPDATE: triggers animation update
-    if self.animation then 
-        self.animation: update(dt)
-    end
+
 end
 
 function GameObject:render()
-    -- MARIO UPDATE: for animation render
-    if self.animation then
-        love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.animation:getCurrentFrame()], self.x, self.y)
-    else   
-        love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
-    end
+    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y, 0 , self.inverted)
 end

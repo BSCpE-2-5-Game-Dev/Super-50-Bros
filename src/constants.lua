@@ -56,6 +56,17 @@ PLAYER_JUMP_VELOCITY = -150
 -- snail movement speed
 SNAIL_MOVE_SPEED = 10
 
+-- MARIO UPDATE: Player's width and height
+PLAYER_WIDTH = 16
+PLAYER_HEIGHT = 20
+
+-- MARIO UPDATE: Flagpole parts' width and height
+POLE_WIDTH = 16
+POLE_HEIGHT = 46
+FLAG_WIDTH = 16
+FLAG_HEIGHT = 16
+
+
 --
 -- tile IDs
 --
@@ -91,22 +102,3 @@ JUMP_BLOCKS = {}
 for i = 1, 30 do
     table.insert(JUMP_BLOCKS, i)
 end
-
--- MARIO UPDATE: constants that will be used in key, lock and flag's attributes and functions
-KEYS_LOCKS = {
-    1, 2, 3, 4  -- for different colors 
-}
-
--- defines the key and lock offsets
-KEY_ID = 0
-LOCK_ID = 4
-
-FLAG_POSTS = {
-    1, 2, 3, 4, 5, 6
-}
-
-FLAGS = {
-    7, 16, 25 ,34
-}
-
-FLAG_OFFSET = 9

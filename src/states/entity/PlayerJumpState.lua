@@ -59,13 +59,19 @@ function PlayerJumpState:update(dt)
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
             if object.solid then
-                object.onCollide(self.player, object)
+                object.onCollide(object)
 
                 self.player.y = object.y + object.height
                 self.player.dy = 0
+                
+                -- IF key is picked and current block is locked block
+                if self.player.keyPicked and object.texture == 'keys-and-locks' then
+                    table.remove(self.player.level.objects, k)
+                end
+
                 self.player:changeState('falling')
             elseif object.consumable then
-                object.onConsume(self.player, object)
+                object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
             end
         end
@@ -76,13 +82,6 @@ function PlayerJumpState:update(dt)
         if entity:collides(self.player) then
             gSounds['death']:play()
             gStateMachine:change('start')
-        end
-    end
-
-    -- MARIO UPDATE: remove lock block if marked as "remove"
-    for k, object in pairs(self.player.level.objects) do
-        if object.remove then
-            table.remove(self.player.level.objects, k)
         end
     end
 end

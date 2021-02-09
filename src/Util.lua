@@ -34,6 +34,39 @@ function GenerateQuads(atlas, tilewidth, tileheight)
     return spritesheet
 end
 
+
+-- MARIO UDPATE:  Generate quads for flag pole
+function GeneratePoleQuads(atlas, tilewidth, tileheight)
+
+
+    local spritesheet = {}
+    local sheetCounter = 1
+
+    -- As there are only 6 flag poles to consider
+    for x= 0, 5 do
+        spritesheet[sheetCounter] = love.graphics.newQuad(x * tilewidth, 0 , tilewidth ,tileheight, atlas:getDimensions())
+        sheetCounter = sheetCounter + 1
+    end
+    return spritesheet
+end
+
+
+-- MARIO UPDATE:  Generate Flag quad
+
+function GenerateFlagQuad(atlas, tileWidth, tileHeight)
+
+    local spritesheet = {}
+    local spriteCounter = 1
+
+    local flagStartX = 96
+
+    for y= 0 , 3 do
+        spritesheet[spriteCounter] = love.graphics.newQuad(flagStartX, y * tileHeight, tileWidth, tileHeight, atlas:getDimensions())
+        spriteCounter = spriteCounter + 1
+    end
+    return spritesheet
+end
+
 --[[
     Divides quads we've generated via slicing our tile sheet into separate tile sets.
 ]]

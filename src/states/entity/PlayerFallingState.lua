@@ -71,7 +71,7 @@ function PlayerFallingState:update(dt)
                     self.player:changeState('idle')
                 end
             elseif object.consumable then
-                object.onConsume(self.player, object)
+                object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
             end
         end
@@ -84,13 +84,6 @@ function PlayerFallingState:update(dt)
             gSounds['kill2']:play()
             self.player.score = self.player.score + 100
             table.remove(self.player.level.entities, k)
-        end
-    end
-
-    -- MARIO UPDATE: remove lock block if marked as "remove"
-    for k, object in pairs(self.player.level.objects) do
-        if object.remove then
-            table.remove(self.player.level.objects, k)
         end
     end
 end

@@ -39,3 +39,15 @@ function TileMap:render()
         end
     end
 end
+
+-- MARIO UPDATE: Get the first X position where the tile is solid
+function TileMap:getFirstGround()
+    for x = 1, self.width do
+        if self.tiles[7][x].id == TILE_ID_GROUND then
+            print("First X at .. " .. x)
+            -- Do -1 for coordinates are 0 indexed
+            return x-1
+        end
+    end
+    return 0
+end

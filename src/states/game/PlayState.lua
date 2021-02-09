@@ -10,32 +10,33 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.camX = 0
     self.camY = 0
-
-    self.background = math.random(3)
     self.backgroundX = 0
-
     self.gravityOn = true
     self.gravityAmount = 6
 end
 
 function PlayState:enter(params)
-    self.level = LevelMaker.generate(params.levelWidth, 10)
+    self.level = LevelMaker.generate(params.width, 10) -- MARIO UPDATE: increments the map width
     self.tileMap = self.level.tileMap
-
+    self.background = math.random(3)
+    
     self.player = Player({
-        x = 0, y = 0,
-        width = 16, height = 20,
-        texture = 'blue-alien', -- MARIO UPDATE
+        -- Move player based on first ground tile
+        -- tile height is multiplied so that player is at right
+        -- starting tile. Half-size is added so that player
+        -- is at near center of ground tile
+        x = (self.tileMap:getFirstGround() * TILE_SIZE) + TILE_SIZE/2, y = 0,
+        width = PLAYER_WIDTH, height = PLAYER_HEIGHT,
+        texture = 'blue-alien',
         stateMachine = StateMachine {
             ['idle'] = function() return PlayerIdleState(self.player) end,
             ['walking'] = function() return PlayerWalkingState(self.player) end,
             ['jump'] = function() return PlayerJumpState(self.player, self.gravityAmount) end,
             ['falling'] = function() return PlayerFallingState(self.player, self.gravityAmount) end
         },
-        score = params.score,
         map = self.tileMap,
         level = self.level,
-        levelComplete = params.levelComplete or false
+        score = params.score -- MARIO UPDATE: holds the previous score of the finished level
     })
 
     self:spawnEnemies()
@@ -52,7 +53,6 @@ function PlayState:update(dt)
     -- update player and level
     self.player:update(dt)
     self.level:update(dt)
-    
 
     -- constrain player X no matter which state
     if self.player.x <= 0 then
@@ -81,15 +81,6 @@ function PlayState:render()
     self.player:render()
     love.graphics.pop()
     
-    -- MARIO UPDATE: render key
-    if self.player.keyObj then
-        love.graphics.draw(gTextures[self.player.keyObj.texture], gFrames[self.player.keyObj.texture][self.player.keyObj.frame], 5, 20)
-    end
-
-    if self.player.levelComplete then
-        self.player:renderlevelComplete()
-    end
-
     -- render score
     love.graphics.setFont(gFonts['medium'])
     love.graphics.setColor(0, 0, 0, 255)

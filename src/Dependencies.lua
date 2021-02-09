@@ -72,13 +72,11 @@ gTextures = {
     ['jump-blocks'] = love.graphics.newImage('graphics/jump_blocks.png'),
     ['gems'] = love.graphics.newImage('graphics/gems.png'),
     ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
-    -- MARIO UPDATE: Changing the character
     ['blue-alien'] = love.graphics.newImage('graphics/blue_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
-    -- MARIO UPDATE: Adding keys and locks spritesheet
-    ['keys-locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
-    -- MARIO UPDATE:  Adding flags spritesheet
-    ['flags'] = love.graphics.newImage('graphics/flags.png')
+    ['keys-and-locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
+    ['flag'] = love.graphics.newImage('graphics/flags.png'),
+    ['pole'] = love.graphics.newImage('graphics/flags.png'),
 }
 
 gFrames = {
@@ -90,10 +88,12 @@ gFrames = {
     ['jump-blocks'] = GenerateQuads(gTextures['jump-blocks'], 16, 16),
     ['gems'] = GenerateQuads(gTextures['gems'], 16, 16),
     ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
-    ['blue-alien'] = GenerateQuads(gTextures['blue-alien'], 16, 20), -- MARIO UPDATE: new frame set for character
+    ['blue-alien'] = GenerateQuads(gTextures['blue-alien'], 16, 20),
     ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
-    ['keys-locks'] = GenerateQuads(gTextures['keys-locks'], 16, 16), -- MARIO UPDATE: frame set of keys and locks
-    ['flags'] = GenerateQuads(gTextures['flags'], 16, 16) -- MARIO UPDATE: frame set of goal flag 
+    -- MARIO UPDATE: Imports flag, keys and locks sprite sheet
+    ['keys-and-locks'] = GenerateQuads(gTextures['keys-and-locks'], 16, 16), 
+    ['pole'] = GeneratePoleQuads(gTextures['pole'], POLE_WIDTH, POLE_HEIGHT),
+    ['flag'] = GenerateFlagQuad(gTextures['pole'], FLAG_WIDTH, FLAG_HEIGHT),
 }
 
 -- these need to be added after gFrames is initialized because they refer to gFrames from within

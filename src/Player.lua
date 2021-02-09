@@ -12,14 +12,8 @@ Player = Class{__includes = Entity}
 
 function Player:init(def)
     Entity.init(self, def)
-    -- MARIO UPDATE
-    self.score = def.score or 0
-    self.keyObj = nil
-    self.levelComplete = def.levelComplete
-
-    if self.levelComplete then
-        Timer.after(4, function () self.levelComplete = false end)
-    end
+    self.score = def.score
+    self.keyPicked = false -- MARIO UPDATE: keyPicked attribute
 end
 
 function Player:update(dt)
@@ -28,14 +22,6 @@ end
 
 function Player:render()
     Entity.render(self)
-end
-
-function Player:renderlevelComplete()
-    love.graphics.setFont(gFonts['medium'])
-    lvoe.graphics.setColor(0, 0, 0, 255)
-    love.graphics.printf("Level Complete!", 0, 5, VIRTUAL_WIDTH, 'center')
-    love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.printf("Level Complete!", 0, 4, VIRTUAL_WIDTH - 1, 'center')
 end
 
 function Player:checkLeftCollisions(dt)
@@ -48,7 +34,6 @@ function Player:checkLeftCollisions(dt)
         self.x = (tileTopLeft.x - 1) * TILE_SIZE + tileTopLeft.width - 1
     else
         
-        -- allow us to walk atop solid objects even if we collide with them
         self.y = self.y - 1
         local collidedObjects = self:checkObjectCollisions()
         self.y = self.y + 1
@@ -70,7 +55,6 @@ function Player:checkRightCollisions(dt)
         self.x = (tileTopRight.x - 1) * TILE_SIZE - self.width
     else
         
-        -- allow us to walk atop solid objects even if we collide with them
         self.y = self.y - 1
         local collidedObjects = self:checkObjectCollisions()
         self.y = self.y + 1
@@ -90,8 +74,9 @@ function Player:checkObjectCollisions()
             if object.solid then
                 table.insert(collidedObjects, object)
             elseif object.consumable then
-                object.onConsume(self, object)
+                object.onConsume(self)
                 table.remove(self.level.objects, k)
+                
             end
         end
     end
